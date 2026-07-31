@@ -1,12 +1,26 @@
 /* Independent YouTube bilingual subtitles for Surge. Configuration is stored in BoxJs. */
+function readSetting(name) {
+	const direct = $persistentStore.read(`@YouTubeOpenAI.Settings.${name}`);
+	if (direct !== null && direct !== undefined) return direct;
+	const stored = $persistentStore.read("YouTubeOpenAI");
+	if (!stored) return null;
+	try { return JSON.parse(stored)?.Settings?.[name] ?? null; } catch { return null; }
+}
+
+function readBoolean(name, fallback) {
+	const value = readSetting(name);
+	if (value === null || value === undefined || value === "") return fallback;
+	return value === true || value === "true" || value === 1 || value === "1";
+}
+
 const CONFIG = {
-	enabled: $persistentStore.read("@YouTubeOpenAI.Settings.Enabled") !== "false",
-	endpoint: $persistentStore.read("@YouTubeOpenAI.Settings.Endpoint") || "",
-	apiKey: $persistentStore.read("@YouTubeOpenAI.Settings.APIKey") || "",
-	model: $persistentStore.read("@YouTubeOpenAI.Settings.Model") || "",
-	targetLanguage: $persistentStore.read("@YouTubeOpenAI.Settings.TargetLanguage") || "zh-Hans",
-	sourceLanguage: $persistentStore.read("@YouTubeOpenAI.Settings.SourceLanguage") || "auto",
-	showOnly: $persistentStore.read("@YouTubeOpenAI.Settings.ShowOnly") === "true",
+	enabled: readBoolean("Enabled", true),
+	endpoint: readSetting("Endpoint") || "",
+	apiKey: readSetting("APIKey") || "",
+	model: readSetting("Model") || "",
+	targetLanguage: readSetting("TargetLanguage") || "zh-Hans",
+	sourceLanguage: readSetting("SourceLanguage") || "auto",
+	showOnly: readBoolean("ShowOnly", false),
 	batchSize: 24,
 	concurrency: 2,
 };
@@ -82,6 +96,7 @@ async function translateAll(rows) {
 		if (text) { rows.push(text); eventIndexes.push(index); }
 	});
 	if (!rows.length) return $done({});
+	console.log(`[YouTube OpenAI subtitles] translating ${rows.length} rows with ${CONFIG.model}`);
 	const translations = await translateAll(rows);
 	eventIndexes.forEach((eventIndex, rowIndex) => {
 		const original = subtitle.events[eventIndex].segs.map(segment => segment?.utf8 ?? "").join("");
