@@ -1,8 +1,4 @@
-{
-  "id": "youtube_openai_subtitles",
-  "name": "YouTube OpenAI 字幕翻译",
-  "desc": "独立 YouTube 双语字幕翻译器；API 凭证仅保存在本机 BoxJs。",
-  "settings": [
+[
     { "id": "@YouTubeOpenAI.Settings.Enabled", "name": "启用翻译", "type": "boolean", "val": true, "desc": "关闭后不修改字幕。" },
     { "id": "@YouTubeOpenAI.Settings.Endpoint", "name": "OpenAI 兼容 API URL", "type": "input", "val": "", "desc": "Base URL，例如 https://api.example.com/v1；也可填写完整 /chat/completions 地址。" },
     { "id": "@YouTubeOpenAI.Settings.APIKey", "name": "API Key", "type": "input", "val": "", "desc": "仅保存在本机 BoxJs，不写入脚本或仓库。" },
@@ -10,5 +6,4 @@
     { "id": "@YouTubeOpenAI.Settings.TargetLanguage", "name": "目标语言", "type": "selects", "val": "zh-Hans", "items": [ { "key": "zh-Hans", "label": "中文（简体）" }, { "key": "zh-Hant", "label": "中文（繁体）" }, { "key": "en", "label": "English" }, { "key": "ja", "label": "日本語" }, { "key": "ko", "label": "한국어" }, { "key": "es", "label": "Español" }, { "key": "fr", "label": "Français" }, { "key": "de", "label": "Deutsch" } ], "desc": "源语言默认自动识别。" },
     { "id": "@YouTubeOpenAI.Settings.SourceLanguage", "name": "源语言", "type": "selects", "val": "auto", "items": [ { "key": "auto", "label": "自动识别" }, { "key": "en", "label": "English" }, { "key": "ja", "label": "日本語" }, { "key": "ko", "label": "한국어" }, { "key": "zh-Hans", "label": "中文（简体）" }, { "key": "zh-Hant", "label": "中文（繁体）" } ] },
     { "id": "@YouTubeOpenAI.Settings.ShowOnly", "name": "只显示译文", "type": "boolean", "val": false, "desc": "关闭时显示原文和译文两行。" }
-  ]
-}
+]
