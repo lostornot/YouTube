@@ -27,18 +27,25 @@ function postJSON(options) {
 }
 
 async function translateBatch(rows) {
-	const data = await postJSON({
+	const messages = [
+		{ role: "system", content: "You translate timed subtitles. Preserve the number and order of subtitle rows exactly. Preserve meaning, punctuation, names, numbers, and line breaks. Return only valid JSON in exactly this shape: {\\\"translations\\\":[\\\"...\\\"]}. Do not add Markdown or explanations." },
+		{ role: "user", content: JSON.stringify({ source_language: CONFIG.sourceLanguage === "auto" ? "auto-detect" : CONFIG.sourceLanguage, target_language: CONFIG.targetLanguage, subtitles: rows }) },
+	];
+	const request = body => postJSON({
 		url: completionURL(CONFIG.endpoint),
 		headers: { Authorization: `Bearer ${CONFIG.apiKey}`, "Content-Type": "application/json; charset=utf-8", Accept: "application/json" },
-		body: JSON.stringify({
-			model: CONFIG.model,
-			temperature: 0,
-			messages: [
-				{ role: "system", content: "You translate timed subtitles. Preserve the number and order of subtitle rows exactly. Preserve meaning, punctuation, names, numbers, and line breaks. Return only valid JSON in exactly this shape: {\\\"translations\\\":[\\\"...\\\"]}. Do not add Markdown or explanations." },
-				{ role: "user", content: JSON.stringify({ source_language: CONFIG.sourceLanguage === "auto" ? "auto-detect" : CONFIG.sourceLanguage, target_language: CONFIG.targetLanguage, subtitles: rows }) },
-			],
-		}),
+		body: JSON.stringify(body),
 	});
+	const baseBody = { model: CONFIG.model, temperature: 0, messages };
+	const optimizedBody = { ...baseBody, response_format: { type: "json_object" } };
+	if (/deepseek/i.test(CONFIG.model)) optimizedBody.thinking = { type: "disabled" };
+	let data;
+	try {
+		data = await request(optimizedBody);
+	} catch (error) {
+		if (!/HTTP (400|422)\b/.test(String(error?.message || error))) throw error;
+		data = await request(baseBody);
+	}
 	const body = JSON.parse(data);
 	const content = body?.choices?.[0]?.message?.content;
 	if (typeof content !== "string") throw new Error(body?.error?.message || "API response does not contain choices[0].message.content.");
