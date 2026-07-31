@@ -101,7 +101,32 @@ export default defineConfig({
 					key: "Microsoft",
 					label: "Microsoft Translator（需填写API）",
 				},
+				{
+					key: "OpenAI",
+					label: "OpenAI 兼容 API（需填写 URL、Key、模型）",
+				},
 			],
+		},
+		{
+			key: "OpenAI.URL",
+			name: "[OpenAI] API URL",
+			defaultValue: "",
+			type: "string",
+			description: "填写 Base URL（如 https://example.com/v1）或完整的 /chat/completions 地址。",
+		},
+		{
+			key: "OpenAI.Auth",
+			name: "[OpenAI] API Key",
+			defaultValue: "",
+			type: "string",
+			description: "仅保存于本机脚本配置；请使用专用、限额的 Key。",
+		},
+		{
+			key: "OpenAI.Model",
+			name: "[OpenAI] 模型",
+			defaultValue: "",
+			type: "string",
+			description: "填写该兼容服务实际提供的模型名称。",
 		},
 		{
 			key: "ShowOnly",
